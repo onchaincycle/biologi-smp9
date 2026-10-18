@@ -377,7 +377,8 @@
       </button>
       <div id="pin-avatar" style="font-size: 3rem; margin-bottom: 0.5rem;">🦁</div>
       <h2 id="pin-name" style="font-size: 1.5rem; font-weight: 800; color: #fff;">Masukkan PIN Abia</h2>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Default PIN: <span id="default-pin-hint" style="color: #38bdf8; font-weight: 700;">1234</span></p>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Masukkan 4 digit PIN rahasiamu</p>
+      <span id="default-pin-hint" style="display:none;"></span>
 
       <div class="pin-dots">
         <div class="pin-dot" id="pdot-0"></div>
@@ -404,6 +405,37 @@
     </div>
   </div>
 
+  <!-- MODAL GANTI PIN -->
+  <div id="change-pin-modal" style="display: none; position: fixed; inset: 0; background: rgba(9, 13, 22, 0.94); backdrop-filter: blur(12px); z-index: 250; justify-content: center; align-items: center; padding: 1.5rem;">
+    <div style="background: var(--surface); border: 1px solid var(--surface-border); border-radius: 18px; padding: 2rem; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔒</div>
+      <h3 style="font-size: 1.35rem; color: #fff; font-weight: 800;">Ganti PIN Profil</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; margin-bottom: 1.25rem;">Profil: <strong id="change-pin-prof-name" style="color: #38bdf8;">Abia</strong></p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.85rem; text-align: left;">
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">PIN Lama (4 Digit):</label>
+          <input type="password" maxlength="4" id="input-old-pin" placeholder="••••" style="width: 100%; background: #0f172a; border: 1px solid var(--surface-border); color: #fff; padding: 0.75rem 1rem; border-radius: 8px; font-size: 1.1rem; letter-spacing: 4px; text-align: center; margin-top: 0.35rem;">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">PIN Baru (4 Digit):</label>
+          <input type="password" maxlength="4" id="input-new-pin" placeholder="••••" style="width: 100%; background: #0f172a; border: 1px solid var(--surface-border); color: #fff; padding: 0.75rem 1rem; border-radius: 8px; font-size: 1.1rem; letter-spacing: 4px; text-align: center; margin-top: 0.35rem;">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Konfirmasi PIN Baru:</label>
+          <input type="password" maxlength="4" id="input-confirm-pin" placeholder="••••" style="width: 100%; background: #0f172a; border: 1px solid var(--surface-border); color: #fff; padding: 0.75rem 1rem; border-radius: 8px; font-size: 1.1rem; letter-spacing: 4px; text-align: center; margin-top: 0.35rem;">
+        </div>
+      </div>
+
+      <p id="change-pin-msg" style="color: var(--danger); font-size: 0.82rem; margin-top: 0.75rem; min-height: 18px; font-weight: 600;"></p>
+
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+        <button onclick="closeChangePinModal()" style="flex: 1; background: #334155; color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem;">Batal</button>
+        <button onclick="saveNewPin()" style="flex: 1; background: var(--primary); color: #fff; border: none; padding: 0.75rem; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.9rem;">Simpan PIN</button>
+      </div>
+    </div>
+  </div>
+
   <!-- APP HEADER -->
   <header>
     <div class="brand">
@@ -414,13 +446,18 @@
       </div>
     </div>
 
-    <div class="user-pill" onclick="openProfileModal()">
-      <span class="user-avatar" id="header-avatar">🦁</span>
-      <div>
-        <div class="user-name" id="header-name">Abia</div>
-        <div style="font-size: 0.7rem; color: #34d399;">Streak: <span id="header-streak">1</span> Hari 🔥</div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div class="user-pill" onclick="openProfileModal()">
+        <span class="user-avatar" id="header-avatar">🦁</span>
+        <div>
+          <div class="user-name" id="header-name">Abia</div>
+          <div style="font-size: 0.7rem; color: #34d399;">Streak: <span id="header-streak">1</span> Hari 🔥</div>
+        </div>
+        <button class="switch-btn">Ganti</button>
       </div>
-      <button class="switch-btn">Ganti</button>
+      <button onclick="openChangePinModal()" title="Ganti PIN Profil" style="background: var(--surface-light); border: 1px solid var(--surface-border); color: #94a3b8; padding: 0.45rem 0.75rem; border-radius: 20px; font-size: 0.75rem; cursor: pointer; font-weight: 700; transition: all 0.2s;">
+        🔒 Ganti PIN
+      </button>
     </div>
   </header>
 
@@ -783,24 +820,82 @@
       }
     }
 
+    function getProfilePin(pKey) {
+      const customPins = JSON.parse(localStorage.getItem('tutor9_custom_pins') || '{}');
+      return customPins[pKey] || PROFILES[pKey].defaultPin;
+    }
+
+    function setProfilePin(pKey, newPin) {
+      const customPins = JSON.parse(localStorage.getItem('tutor9_custom_pins') || '{}');
+      customPins[pKey] = newPin;
+      localStorage.setItem('tutor9_custom_pins', JSON.stringify(customPins));
+    }
+
     function verifyPin() {
-      const prof = PROFILES[selectedPendingProfile];
-      if (pinBuffer === prof.defaultPin) {
+      const expectedPin = getProfilePin(selectedPendingProfile);
+      if (pinBuffer === expectedPin) {
         currentActiveProfile = selectedPendingProfile;
         document.getElementById('profile-modal').style.display = 'none';
         applyActiveProfile();
       } else {
-        document.getElementById('pin-err-msg').textContent = 'PIN keliru. Coba lagi atau gunakan OTP!';
+        document.getElementById('pin-err-msg').textContent = 'PIN keliru. Coba lagi atau minta bantuan Ortu!';
         pinBuffer = '';
         updatePinDots();
       }
     }
 
     function triggerOtpTelegram() {
-      alert('Kode OTP 6-digit verifikasi berhasil dikirimkan ke Telegram Pak Iman! (Simulasi Kode: 492810)');
-      pinBuffer = PROFILES[selectedPendingProfile].defaultPin;
+      const activePin = getProfilePin(selectedPendingProfile);
+      alert('Kode OTP Verifikasi telah dikirimkan ke Telegram Pak Iman!
+(PIN aktif untuk profil ini: ' + activePin + ')');
+      pinBuffer = activePin;
       updatePinDots();
       setTimeout(verifyPin, 300);
+    }
+
+    function openChangePinModal() {
+      document.getElementById('change-pin-modal').style.display = 'flex';
+      document.getElementById('change-pin-prof-name').textContent = PROFILES[currentActiveProfile].name;
+      document.getElementById('input-old-pin').value = '';
+      document.getElementById('input-new-pin').value = '';
+      document.getElementById('input-confirm-pin').value = '';
+      document.getElementById('change-pin-msg').textContent = '';
+    }
+
+    function closeChangePinModal() {
+      document.getElementById('change-pin-modal').style.display = 'none';
+    }
+
+    function saveNewPin() {
+      const oldPinInput = document.getElementById('input-old-pin').value.trim();
+      const newPinInput = document.getElementById('input-new-pin').value.trim();
+      const confirmPinInput = document.getElementById('input-confirm-pin').value.trim();
+      const msg = document.getElementById('change-pin-msg');
+
+      const currentStoredPin = getProfilePin(currentActiveProfile);
+      if (oldPinInput !== currentStoredPin) {
+        msg.style.color = 'var(--danger)';
+        msg.textContent = 'PIN Lama salah!';
+        return;
+      }
+      if (newPinInput.length !== 4 || isNaN(newPinInput)) {
+        msg.style.color = 'var(--danger)';
+        msg.textContent = 'PIN Baru harus 4 digit angka!';
+        return;
+      }
+      if (newPinInput !== confirmPinInput) {
+        msg.style.color = 'var(--danger)';
+        msg.textContent = 'Konfirmasi PIN Baru tidak cocok!';
+        return;
+      }
+
+      setProfilePin(currentActiveProfile, newPinInput);
+      msg.style.color = 'var(--success)';
+      msg.textContent = 'PIN berhasil diubah!';
+      setTimeout(() => {
+        closeChangePinModal();
+        alert('PIN untuk profil ' + PROFILES[currentActiveProfile].name + ' berhasil diperbarui!');
+      }, 400);
     }
 
     function applyActiveProfile() {
