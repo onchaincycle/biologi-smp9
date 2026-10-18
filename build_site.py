@@ -1,0 +1,885 @@
+import json
+
+html_content = '''<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biologi Kelas 9 - Bab 1: Sistem Reproduksi Manusia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #059669;
+      --accent: #8b5cf6;
+      --bg-dark: #0f172a;
+      --card-dark: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --correct: #10b981;
+      --wrong: #ef4444;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: white;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: #0f172a;
+      padding: 0.25rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+    .action-btn {
+      background: #334155;
+      color: white;
+      border: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.2s;
+    }
+    .action-btn:hover {
+      background: #475569;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .tab-content {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* SLIDE PRESENTATION STYLES */
+    #slide-container {
+      background: var(--card-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      flex: 1;
+      min-height: 580px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .slide-body {
+      flex: 1;
+      padding: 3rem;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .slide-body.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-tag {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.35rem 0.8rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+      width: fit-content;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .slide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .info-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .info-card:hover {
+      transform: translateY(-2px);
+      border-color: #38bdf8;
+    }
+    .info-card h4 {
+      color: #38bdf8;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .info-card p, .info-card li {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .info-card ul {
+      margin-left: 1.2rem;
+      margin-top: 0.5rem;
+    }
+    .mnemonic-box {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(37, 99, 235, 0.2));
+      border: 1px dashed #8b5cf6;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #c4b5fd;
+    }
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 2.5rem;
+      background: rgba(15, 23, 42, 0.7);
+      border-top: 1px solid var(--border-color);
+    }
+    .slide-progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(to right, #0284c7, #8b5cf6);
+      transition: width 0.3s ease;
+    }
+    .slide-ctrl-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .slide-ctrl-btn:disabled {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+    .slide-ctrl-btn:not(:disabled):hover {
+      background: var(--primary-dark);
+    }
+
+    /* QUIZ SECTION STYLES */
+    .quiz-container {
+      background: var(--card-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+    .score-badge {
+      background: #0284c7;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .question-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+      transition: border-color 0.2s;
+    }
+    .question-card.answered-correct {
+      border-color: var(--correct);
+    }
+    .question-card.answered-wrong {
+      border-color: var(--wrong);
+    }
+    .q-number {
+      font-weight: 800;
+      color: #38bdf8;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .q-text {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .option-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text-main);
+      padding: 0.9rem 1.25rem;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #334155;
+      border-color: #64748b;
+    }
+    .option-btn.correct {
+      background: rgba(16, 185, 129, 0.2) !important;
+      border-color: var(--correct) !important;
+      color: #6ee7b7 !important;
+      font-weight: 600;
+    }
+    .option-btn.wrong {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: var(--wrong) !important;
+      color: #fca5a5 !important;
+    }
+    .explanation-box {
+      margin-top: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      display: none;
+    }
+    .explanation-box.correct {
+      display: block;
+      background: rgba(16, 185, 129, 0.12);
+      border-left: 4px solid var(--correct);
+      color: #a7f3d0;
+    }
+    .explanation-box.wrong {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      border-left: 4px solid var(--wrong);
+      color: #fecaca;
+    }
+    .explanation-title {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* FULLSCREEN OVERRIDE */
+    :fullscreen #slide-container {
+      border-radius: 0;
+      height: 100vh;
+      border: none;
+    }
+    :-webkit-full-screen #slide-container {
+      border-radius: 0;
+      height: 100vh;
+      border: none;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.75rem; }
+      main { padding: 1rem; }
+      .slide-title { font-size: 1.6rem; }
+      .slide-body { padding: 1.5rem; }
+      .slide-footer { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-badge">SMPIT NF</span>
+      <span>Biologi Kelas 9 · Bab 1</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('slide')">
+        <span>🖥️</span> Slide Presentasi
+      </button>
+      <button class="tab-btn" onclick="switchTab('quiz')">
+        <span>📝</span> Latihan Soal & Pembahasan
+      </button>
+    </div>
+    <div>
+      <button class="action-btn" onclick="toggleFullscreen()" title="Full Screen (F)">
+        <span id="fs-icon">⛶</span> Full Screen
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: SLIDE PRESENTATION -->
+    <section id="tab-slide" class="tab-content active">
+      <div id="slide-container">
+        <div class="slide-progress-bar" id="progress-bar" style="width: 12.5%;"></div>
+
+        <!-- SLIDE 1: COVER -->
+        <div class="slide-body active" data-index="0">
+          <span class="slide-tag">Bab 1 · Kurikulum IPA SMPIT</span>
+          <h1 class="slide-title">Sistem Reproduksi pada Manusia</h1>
+          <p style="color: #cbd5e1; font-size: 1.15rem; max-width: 700px; line-height: 1.7; margin-bottom: 2rem;">
+            Rangkuman lengkap & terstruktur materi Biologi Level 9: memahami pembelahan sel, anatomi organ reproduksi pria & wanita, proses fertilisasi, menstruasi, hingga pencegahan penyakit reproduksi.
+          </p>
+          <div class="slide-grid">
+            <div class="info-card">
+              <h4>🧬 1. Pembelahan Sel</h4>
+              <p>Mekanisme mitosis untuk pertumbuhan & meiosis untuk pembentukan sel gamet (sperma & ovum).</p>
+            </div>
+            <div class="info-card">
+              <h4>🚻 2. Organ Reproduksi</h4>
+              <p>Anatomi & peran organ kelamin dalam/luar serta kelenjar penghasil cairan sperma dan hormon.</p>
+            </div>
+            <div class="info-card">
+              <h4>🔄 3. Siklus & Fertilisasi</h4>
+              <p>Fase menstruasi (FSH, Estrogen, LH, Progesteron) dan fertilisasi sel telur di oviduk.</p>
+            </div>
+            <div class="info-card">
+              <h4>🛡️ 4. Kesehatan & PMS</h4>
+              <p>Mengenal penyakit infeksi (Gonore, Sifilis, HIV) dan pola hidup higienis menjaga organ reproduksi.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2: PEMBELAHAN SEL MITOSIS VS MEIOSIS -->
+        <div class="slide-body" data-index="1">
+          <span class="slide-tag">Sub-Bab 1.1 · Pembelahan Sel</span>
+          <h2 class="slide-title">Mitosis vs Meiosis</h2>
+          <div class="slide-grid">
+            <div class="info-card" style="border-top: 4px solid #38bdf8;">
+              <h4>🌿 Pembelahan Mitosis</h4>
+              <ul>
+                <li><strong>Lokasi:</strong> Sel tubuh (sel somatis).</li>
+                <li><strong>Tujuan:</strong> Pertumbuhan, perbaikan jaringan rusak, & regenerasi sel.</li>
+                <li><strong>Jumlah Sel Anak:</strong> Menghasilkan <strong>2 sel anakan</strong>.</li>
+                <li><strong>Sifat Kromosom:</strong> Identik dengan induk, bersifat <strong>Diploid (2n)</strong>.</li>
+                <li><strong>Jumlah Pembelahan:</strong> 1 kali pembelahan (P-M-A-T).</li>
+              </ul>
+            </div>
+            <div class="info-card" style="border-top: 4px solid #a855f7;">
+              <h4>🥚 Pembelahan Meiosis (Reduksi)</h4>
+              <ul>
+                <li><strong>Lokasi:</strong> Organ reproduksi (testis & ovarium).</li>
+                <li><strong>Tujuan:</strong> Menghasilkan sel kelamin/gamet (sperma & ovum).</li>
+                <li><strong>Jumlah Sel Anak:</strong> Menghasilkan <strong>4 sel anakan</strong>.</li>
+                <li><strong>Sifat Kromosom:</strong> Separuh dari induk, bersifat <strong>Haploid (n)</strong>.</li>
+                <li><strong>Jumlah Pembelahan:</strong> 2 kali (Meiosis I & Meiosis II).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="mnemonic-box">
+            💡 <strong>Kunci Ingat:</strong> Meiosis disebut <em>pembelahan reduksi</em> karena jumlah kromosom anakan berkurang setengahnya (dari 2n=46 menjadi n=23) agar saat sperma membuahi ovum, zigot tetap memiliki 46 kromosom!
+          </div>
+        </div>
+
+        <!-- SLIDE 3: TAHAPAN PMAT -->
+        <div class="slide-body" data-index="2">
+          <span class="slide-tag">Sub-Bab 1.2 · Tahapan Pembelahan</span>
+          <h2 class="slide-title">Fase Pembelahan: PMAT</h2>
+          <div class="slide-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+            <div class="info-card">
+              <h4>1. Profase</h4>
+              <p>• Benang kromatin memendek & menebal jadi <strong>kromosom</strong>.<br>• Membran inti sel mulai menghilang.<br>• Sentrosom membelah membentuk benang spindel.</p>
+            </div>
+            <div class="info-card">
+              <h4>2. Metafase</h4>
+              <p>• Kromosom <strong>berjajar tepat di bidang pembelahan (ekuator)</strong>.<br>• Benang spindel mengikat sentromer kromosom.<br>• Fase terbaik untuk mengamati kromosom.</p>
+            </div>
+            <div class="info-card">
+              <h4>3. Anafase</h4>
+              <p>• Kromatid saudara <strong>memisah dan ditarik</strong> menuju kutub yang berlawanan oleh benang spindel.<br>• Akhir anafase: kedua kutub memiliki jumlah materi genetik yang sama.</p>
+            </div>
+            <div class="info-card">
+              <h4>4. Telofase</h4>
+              <p>• Membran inti terbentuk kembali.<br>• Kromosom kembali menjadi benang kromatin.<br>• Terjadi <strong>sitokinesis</strong> (pembelahan sitoplasma menjadi 2 sel terpisah).</p>
+            </div>
+          </div>
+          <div class="mnemonic-box">
+            🧠 <strong>Jembatan Keledai:</strong> <strong>P-M-A-T</strong> (<strong>P</strong>rofase = Persiapan, <strong>M</strong>etafase = Mengumpul di tengah, <strong>A</strong>nafase = Arah berlawanan/ditarik, <strong>T</strong>elofase = Terbelah dua).
+          </div>
+        </div>
+
+        <!-- SLIDE 4: ORGAN REPRODUKSI PRIA -->
+        <div class="slide-body" data-index="3">
+          <span class="slide-tag">Sub-Bab 1.3 · Anatomi Pria</span>
+          <h2 class="slide-title">Organ Reproduksi Pria & Fungsinya</h2>
+          <div class="slide-grid">
+            <div class="info-card">
+              <h4>1. Testis & Skrotum</h4>
+              <p>• <strong>Testis:</strong> Tempat produksi sel sperma dan hormon testosteron.<br>• <strong>Skrotum:</strong> Kantong pembungkus testis, berfungsi menjaga suhu testis 1-2°C lebih rendah dari suhu tubuh agar sperma berkembang optimal.</p>
+            </div>
+            <div class="info-card">
+              <h4>2. Saluran Sperma</h4>
+              <p>• <strong>Epididimis:</strong> Tempat penyimpanan sementara dan pematangan sperma.<br>• <strong>Vas Deferens:</strong> Saluran penghubung epididimis menuju uretra.<br>• <strong>Uretra:</strong> Saluran keluar urine sekaligus semen.</p>
+            </div>
+            <div class="info-card">
+              <h4>3. Kelenjar Reproduksi</h4>
+              <p>• <strong>Vesikula Seminalis:</strong> Menghasilkan cairan kaya fruktosa (nutrisi sperma).<br>• <strong>Kelenjar Prostat:</strong> Menghasilkan cairan basa (alkalis) untuk menetralkan keasaman uretra dan vagina.<br>• <strong>Kelenjar Cowper:</strong> Menghasilkan lendir pelumas uretra.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 5: ORGAN REPRODUKSI WANITA -->
+        <div class="slide-body" data-index="4">
+          <span class="slide-tag">Sub-Bab 1.4 · Anatomi Wanita</span>
+          <h2 class="slide-title">Organ Reproduksi Wanita & Fungsinya</h2>
+          <div class="slide-grid">
+            <div class="info-card">
+              <h4>1. Ovarium (Indung Telur)</h4>
+              <p>Berjumlah sepasang, berfungsi menghasilkan <strong>sel telur (ovum)</strong> melalui oogenesis serta memproduksi hormon <strong>estrogen</strong> dan <strong>progesteron</strong>.</p>
+            </div>
+            <div class="info-card">
+              <h4>2. Tuba Fallopi / Oviduk</h4>
+              <p>Saluran dengan ujung berjumbai (<em>fimbriae</em>) untuk menangkap ovum saat ovulasi. Merupakan <strong>tempat terjadinya fertilisasi</strong> (pembuahan ovum oleh sperma).</p>
+            </div>
+            <div class="info-card">
+              <h4>3. Uterus (Rahim) & Endometrium</h4>
+              <p>• <strong>Uterus:</strong> Tempat implantasi embrio dan ruang tumbuh kembang janin selama kehamilan.<br>• <strong>Endometrium:</strong> Lapisan dinding rahim yang menebal dan meluruh saat menstruasi jika tidak ada pembuahan.</p>
+            </div>
+            <div class="info-card">
+              <h4>4. Serviks & Vagina</h4>
+              <p>• <strong>Serviks (Leher Rahim):</strong> Pintu masuk rahim.<br>• <strong>Vagina:</strong> Saluran persalinan alami, tempat keluarnya darah menstruasi, dan organ kopulasi.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 6: SIKLUS MENSTRUASI -->
+        <div class="slide-body" data-index="5">
+          <span class="slide-tag">Sub-Bab 1.5 · Siklus Menstruasi</span>
+          <h2 class="slide-title">Siklus Menstruasi & Regulasi Hormon</h2>
+          <div class="slide-grid">
+            <div class="info-card">
+              <h4>1. Fase Menstruasi (Hari 1-5)</h4>
+              <p>Kadar hormon estrogen & progesteron anjlok drastis. Dinding endometrium meluruh bersama darah keluar melalui vagina.</p>
+            </div>
+            <div class="info-card">
+              <h4>2. Fase Pra-Ovulasi / Folikuler (Hari 6-13)</h4>
+              <p>Hipofisis melepaskan <strong>FSH</strong> (Follicle Stimulating Hormone) memicu pematangan folikel telur. Folikel menghasilkan <strong>estrogen</strong> yang mulai menebalkan endometrium.</p>
+            </div>
+            <div class="info-card">
+              <h4>3. Fase Ovulasi (Hari ke-14)</h4>
+              <p>Lonjakan drastis hormon <strong>LH</strong> (Luteinizing Hormone) merangsang pecahnya folikel dan pelepasan sel telur matang dari ovarium ke tuba fallopi.</p>
+            </div>
+            <div class="info-card">
+              <h4>4. Fase Pasca-Ovulasi / Luteal (Hari 15-28)</h4>
+              <p>Bekas folikel menjadi <em>korpus luteum</em> yang memproduksi <strong>progesteron</strong> dalam jumlah tinggi untuk mempertahankan ketebalan dinding rahim siap hamil.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 7: FERTILISASI & KEHAMILAN -->
+        <div class="slide-body" data-index="6">
+          <span class="slide-tag">Sub-Bab 1.6 · Pembuahan</span>
+          <h2 class="slide-title">Fertilisasi hingga Kelahiran</h2>
+          <div class="slide-grid">
+            <div class="info-card">
+              <h4>1. Fertilisasi (Pembuahan)</h4>
+              <p>Peleburan inti sperma (n) dengan inti ovum (n) di dalam <strong>tuba fallopi (oviduk)</strong> menghasilkan sel tunggal <strong>Zigot (2n)</strong>.</p>
+            </div>
+            <div class="info-card">
+              <h4>2. Pembelahan & Implantasi</h4>
+              <p>Zigot membelah secara mitosis (morula &rarr; blastula) sambil bergerak menuju rahim, lalu menempel pada endometrium (<strong>implantasi</strong>).</p>
+            </div>
+            <div class="info-card">
+              <h4>3. Perkembangan Janin</h4>
+              <p>Terbentuk selaput pembungkus embrio:<br>• <strong>Amnion:</strong> Cairan ketuban pelindung dari benturan fisik.<br>• <strong>Plasenta & Tali Pusat:</strong> Penyalur nutrisi dan oksigen dari ibu ke janin.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 8: KESEHATAN SISTEM REPRODUKSI -->
+        <div class="slide-body" data-index="7">
+          <span class="slide-tag">Sub-Bab 1.7 · Kesehatan & Higienitas</span>
+          <h2 class="slide-title">Penyakit Reproduksi & Pola Hidup Bersih</h2>
+          <div class="slide-grid">
+            <div class="info-card">
+              <h4>⚠️ Penyakit Menular Seksual (PMS)</h4>
+              <ul>
+                <li><strong>Gonore (Kencing Nanah):</strong> Bakteri <em>Neisseria gonorrhoeae</em>.</li>
+                <li><strong>Sifilis (Raja Singa):</strong> Bakteri <em>Treponema pallidum</em>.</li>
+                <li><strong>HIV/AIDS:</strong> Virus HIV yang merusak sistem imun tubuh.</li>
+                <li><strong>Keputihan Patologis:</strong> Jamur <em>Candida albicans</em> atau bakteri.</li>
+              </ul>
+            </div>
+            <div class="info-card">
+              <h4>🧼 Kebiasaan Menjaga Kebersihan</h4>
+              <ul>
+                <li>Mengganti pakaian dalam minimal 2x sehari berbahan katun menyerap keringat.</li>
+                <li>Membasuh organ intim dari depan ke belakang setelah buang air agar bakteri anus tidak masuk.</li>
+                <li>Rutin mengganti pembalut tiap 3-4 jam saat menstruasi.</li>
+                <li>Menghindari penggunaan sabun pembersih kewanitaan beraroma tajam terus-menerus.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="mnemonic-box">
+            ✨ <strong>Nilai Karakter Islami (SMPIT):</strong> Menjaga kebersihan dan kehormatan diri adalah bagian dari keimanan (<em>thaharah</em>) untuk memelihara karunia kesehatan tubuh. 
+          </div>
+        </div>
+
+        <!-- FOOTER CONTROLS -->
+        <div class="slide-footer">
+          <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 600;">
+            Slide <span id="cur-slide-num" style="color: white;">1</span> dari <span id="total-slides">8</span>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <button class="slide-ctrl-btn" id="btn-prev" onclick="prevSlide()" disabled>
+              ◀ Sebelumnya
+            </button>
+            <button class="slide-ctrl-btn" id="btn-next" onclick="nextSlide()">
+              Selanjutnya ▶
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: INTERACTIVE QUIZ -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="quiz-container">
+        <div class="quiz-header">
+          <div>
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: white;">Latihan Soal Uji Pemahaman</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">Bab 1: Sistem Reproduksi Manusia · 10 Soal Berbobot Standar Ujian SMP</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="score-badge" id="score-display">Skor: 0 / 10</div>
+            <button class="action-btn" onclick="resetQuiz()">🔄 Ulangi Kuis</button>
+          </div>
+        </div>
+
+        <div id="quiz-questions-list">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // SLIDE DATA & LOGIC
+    let curSlide = 0;
+    const slides = document.querySelectorAll('.slide-body');
+    const totalSlides = slides.length;
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const curSlideNum = document.getElementById('cur-slide-num');
+    const progressBar = document.getElementById('progress-bar');
+
+    function updateSlide() {
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === curSlide);
+      });
+      btnPrev.disabled = curSlide === 0;
+      btnNext.disabled = curSlide === totalSlides - 1;
+      curSlideNum.textContent = curSlide + 1;
+      progressBar.style.width = ((curSlide + 1) / totalSlides * 100) + '%';
+    }
+
+    function nextSlide() {
+      if (curSlide < totalSlides - 1) {
+        curSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (curSlide > 0) {
+        curSlide--;
+        updateSlide();
+      }
+    }
+
+    // TAB SWITCHING
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      if (tabId === 'slide') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-slide').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-quiz').classList.add('active');
+      }
+    }
+
+    // FULLSCREEN TOGGLE
+    function toggleFullscreen() {
+      const container = document.getElementById('slide-container');
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(err => {
+          alert('Gagal beralih ke Fullscreen: ' + err.message);
+        });
+        document.getElementById('fs-icon').textContent = '✖';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fs-icon').textContent = '⛶';
+      }
+    }
+
+    // KEYBOARD NAVIGATION
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('tab-slide').classList.contains('active')) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+          prevSlide();
+        } else if (e.key.toLowerCase() === 'f') {
+          toggleFullscreen();
+        }
+      }
+    });
+
+    // QUIZ DATA
+    const questions = [
+      {
+        q: "Pembelahan sel yang menghasilkan empat sel anakan dengan jumlah kromosom separuh dari sel induk (n) adalah...",
+        options: ["A. Mitosis", "B. Amitosis", "C. Meiosis", "D. Biner"],
+        answer: 2,
+        explain: "Meiosis merupakan pembelahan reduksi yang berlangsung pada organ reproduksi untuk menghasilkan 4 sel gamet (sperma/ovum) dengan sifat haploid (n) atau separuh dari induk (2n)."
+      },
+      {
+        q: "Perhatikan fase pembelahan sel berikut: benang spindel mengikat kromosom dan kromosom berjejer rapi di bidang ekuator (tengah). Fase ini disebut...",
+        options: ["A. Profase", "B. Metafase", "C. Anafase", "D. Telofase"],
+        answer: 1,
+        explain: "Ciri khas Metafase adalah kromosom berjajar tepat di bidang tengah/pembelahan (ekuator). Ingat 'M' = Metafase = Menengah."
+      },
+      {
+        q: "Organ reproduksi pria yang berfungsi menjaga dan mengatur suhu testis agar sesuai untuk spermatogenesis adalah...",
+        options: ["A. Penis", "B. Skrotum", "C. Epididimis", "D. Vas Deferens"],
+        answer: 1,
+        explain: "Skrotum adalah kantong kulit pembungkus testis yang mengatur suhu testis 1-2°C lebih rendah dari suhu tubuh inti, kondisi ideal bagi pembentukan sperma."
+      },
+      {
+        q: "Tempat terjadinya fertilisasi (pembuahan sel telur oleh sel sperma) pada organ reproduksi wanita adalah di...",
+        options: ["A. Ovarium", "B. Uterus (Rahim)", "C. Tuba Fallopi (Oviduk)", "D. Vagina"],
+        answer: 2,
+        explain: "Fertilisasi secara normal terjadi di sepertiga awal saluran Tuba Fallopi (oviduk). Setelah menjadi zigot, sel akan bergerak menuju rahim untuk implantasi."
+      },
+      {
+        q: "Kelenjar reproduksi pria yang memproduksi cairan basa (alkalis) untuk melindungi sperma dari suasana asam pada uretra dan vagina adalah...",
+        options: ["A. Kelenjar Prostat", "B. Vesikula Seminalis", "C. Kelenjar Cowper", "D. Testis"],
+        answer: 0,
+        explain: "Kelenjar Prostat menghasilkan cairan encer keputihan yang bersifat basa untuk menetralkan sifat asam lingkungan uretra pria dan vagina wanita."
+      },
+      {
+        q: "Pelepasan sel telur (ovum) matang dari ovarium menuju oviduk dinamakan...",
+        options: ["A. Menstruasi", "B. Ovulasi", "C. Fertilisasi", "D. Implantasi"],
+        answer: 1,
+        explain: "Ovulasi adalah peristiwa keluarnya sel telur yang telah masak dari folikel ovarium, yang dipicu oleh lonjakan hormon Luteinizing Hormone (LH)."
+      },
+      {
+        q: "Hormon yang berperan utama merangsang pembentukan folikel sel telur di dalam ovarium pada fase awal siklus menstruasi adalah...",
+        options: ["A. LH (Luteinizing Hormone)", "B. Progesteron", "C. FSH (Follicle Stimulating Hormone)", "D. Oksitosin"],
+        answer: 2,
+        explain: "FSH (Follicle Stimulating Hormone) dihasilkan oleh kelenjar hipofisis anterior untuk memicu pertumbuhan dan pematangan folikel telur di ovarium."
+      },
+      {
+        q: "Dinding rahim yang kaya pembuluh darah dan akan meluruh keluar sebagai darah menstruasi jika tidak terjadi kehamilan adalah...",
+        options: ["A. Endometrium", "B. Miometrium", "C. Perimetrium", "D. Serviks"],
+        answer: 0,
+        explain: "Endometrium adalah lapisan mukosa terdalam rahim yang menebal untuk mempersiapkan penempelan zigot. Jika pembuahan gagal, lapisan ini meluruh saat menstruasi."
+      },
+      {
+        q: "Penyakit reproduksi 'Raja Singa' yang ditandai dengan luka pada kelamin dan disebabkan oleh infeksi bakteri Treponema pallidum disebut...",
+        options: ["A. Gonore", "B. Klamidia", "C. Sifilis", "D. Herpes Genitalis"],
+        answer: 2,
+        explain: "Sifilis (raja singa) disebabkan oleh bakteri Treponema pallidum. Gonore disebabkan oleh Neisseria gonorrhoeae, sedangkan herpes disebabkan oleh virus HSV."
+      },
+      {
+        q: "Cairan pelindung di dalam rahim yang berfungsi melindungi janin dari benturan fisik dan goncangan selama kehamilan adalah cairan...",
+        options: ["A. Alantois", "B. Amnion (Ketuban)", "C. Korion", "D. Plasenta"],
+        answer: 1,
+        explain: "Amnion menghasilkan cairan ketuban (air ketuban) yang bertindak sebagai peredam guncangan mekanik, menjaga suhu janin, dan memberikan ruang gerak bebas bagi janin."
+      }
+    ];
+
+    let userScore = 0;
+    let answeredCount = 0;
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-questions-list');
+      container.innerHTML = '';
+      questions.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q-card-${qIndex}`;
+
+        let optionsHtml = '';
+        q.options.forEach((opt, optIndex) => {
+          optionsHtml += `
+            <button class="option-btn" id="btn-${qIndex}-${optIndex}" onclick="handleAnswer(${qIndex}, ${optIndex})">
+              ${opt}
+            </button>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="q-number">Pertanyaan ${qIndex + 1} dari ${questions.length}</div>
+          <div class="q-text">${q.q}</div>
+          <div class="options-grid">
+            ${optionsHtml}
+          </div>
+          <div class="explanation-box" id="explain-${qIndex}">
+            <div class="explanation-title" id="explain-title-${qIndex}"></div>
+            <div>${q.explain}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function handleAnswer(qIndex, selectedOptIndex) {
+      const q = questions[qIndex];
+      const card = document.getElementById(`q-card-${qIndex}`);
+      const explainBox = document.getElementById(`explain-${qIndex}`);
+      const explainTitle = document.getElementById(`explain-title-${qIndex}`);
+
+      // Disable all options for this question
+      q.options.forEach((_, i) => {
+        const b = document.getElementById(`btn-${qIndex}-${i}`);
+        b.disabled = true;
+        if (i === q.answer) {
+          b.classList.add('correct');
+        }
+      });
+
+      const selectedBtn = document.getElementById(`btn-${qIndex}-${selectedOptIndex}`);
+      const isCorrect = (selectedOptIndex === q.answer);
+
+      if (isCorrect) {
+        userScore++;
+        card.classList.add('answered-correct');
+        explainBox.className = 'explanation-box correct';
+        explainTitle.innerHTML = '✅ <strong>Jawaban Anda Benar!</strong>';
+      } else {
+        selectedBtn.classList.add('wrong');
+        card.classList.add('answered-wrong');
+        explainBox.className = 'explanation-box wrong';
+        explainTitle.innerHTML = '❌ <strong>Jawaban Kurang Tepat</strong>';
+      }
+
+      answeredCount++;
+      document.getElementById('score-display').textContent = `Skor: ${userScore} / ${questions.length}`;
+    }
+
+    function resetQuiz() {
+      userScore = 0;
+      answeredCount = 0;
+      document.getElementById('score-display').textContent = `Skor: 0 / ${questions.length}`;
+      renderQuiz();
+    }
+
+    // INITIALIZE
+    renderQuiz();
+    updateSlide();
+  </script>
+</body>
+</html>
+'''
+
+with open('/Users/imansulaiman/Documents/biologi-smp9/index.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print('Successfully wrote index.html!')
